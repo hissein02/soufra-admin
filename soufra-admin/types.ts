@@ -25,6 +25,7 @@ export interface OrderItem {
     quantity: number
     price_at_time: number
     selected_options?: any
+    steps?: string
 }
 
 export interface Order {
@@ -37,5 +38,6 @@ export interface Order {
     total_amount: number
     created_at: string
     updated_at: string
+    special_request?: string
     order_items?: OrderItem[]
 }

@@ -23,7 +23,7 @@ export default async function RestaurantPage(props: { params: Promise<{ slug: st
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <Link href={`/dashboard/restaurants/${slug}/menu`}>
-                    <Card className="hover:shadow-lg transition-shadow cursor-pointer h-full border-2 hover:border-[#E05D34]/50">
+                    <Card className="hover:shadow-lg transition-shadow cursor-pointer h-full border-2 hover:border-[#E05D34]/50 py-6">
                         <CardHeader className="flex flex-row items-center gap-4">
                             <div className="p-3 bg-orange-100 rounded-lg">
                                 <UtensilsCrossed className="h-8 w-8 text-[#E05D34]" />
@@ -37,7 +37,7 @@ export default async function RestaurantPage(props: { params: Promise<{ slug: st
                 </Link>
 
                 <Link href={`/dashboard/restaurants/${slug}/orders`}>
-                    <Card className="hover:shadow-lg transition-shadow cursor-pointer h-full border-2 hover:border-[#1F4E5F]/50">
+                    <Card className="hover:shadow-lg transition-shadow cursor-pointer h-full border-2 hover:border-[#1F4E5F]/50 py-6">
                         <CardHeader className="flex flex-row items-center gap-4">
                             <div className="p-3 bg-blue-100 rounded-lg">
                                 <ShoppingBag className="h-8 w-8 text-[#1F4E5F]" />

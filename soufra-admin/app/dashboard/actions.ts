@@ -244,6 +244,37 @@ export async function toggleMenuItemAvailability(restaurantId: string, itemId: s
 
 export async function getOrders(restaurantId: string) {
     const supabase = await createClient()
+
+    // Business Day Logic: Day starts at 02:00 AM
+    const now = new Date()
+    const cutoff = new Date(now)
+    cutoff.setHours(2, 0, 0, 0)
+
+    // If it's before 2 AM, the business day started yesterday at 2 AM
+    if (now.getHours() < 2) {
+        cutoff.setDate(cutoff.getDate() - 1)
+    }
+
+    const { data, error } = await supabase
+        .from('orders')
+        .select(`
+            *,
+            order_items (*)
+        `)
+        .eq('restaurant_id', restaurantId)
+        .gte('created_at', cutoff.toISOString())
+        .neq('status', 'cancelled')
+        .order('created_at', { ascending: true })
+
+    if (error) {
+        console.error('Error fetching orders:', error)
+        return []
+    }
+    return data
+}
+
+export async function getAllOrders(restaurantId: string) {
+    const supabase = await createClient()
     const { data, error } = await supabase
         .from('orders')
         .select(`
@@ -254,7 +285,7 @@ export async function getOrders(restaurantId: string) {
         .order('created_at', { ascending: false })
 
     if (error) {
-        console.error('Error fetching orders:', error)
+        console.error('Error fetching all orders:', error)
         return []
     }
     return data
@@ -271,7 +302,8 @@ export async function createOrder(restaurantId: string, orderData: any) {
             order_type: orderData.order_type,
             status: 'pending',
             table_number: orderData.table_number || null,
-            total_amount: orderData.total_amount
+            total_amount: orderData.total_amount,
+            special_request: orderData.special_request || null
         })
         .select()
         .single()
@@ -315,6 +347,7 @@ export async function updateOrder(restaurantId: string, orderId: string, data: a
     if (data.order_type !== undefined) updates.order_type = data.order_type
     if (data.table_number !== undefined) updates.table_number = data.table_number
     if (data.total_amount !== undefined) updates.total_amount = data.total_amount
+    updates.updated_at = new Date().toISOString()
 
     // Only update if there are fields to update
     if (Object.keys(updates).length > 0) {

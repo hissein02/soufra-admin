@@ -13,7 +13,7 @@ import {
 } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Plus, Trash2, ShoppingCart, Check, ChevronsUpDown } from 'lucide-react'
+import { Plus, Trash2, ShoppingCart, Check, ChevronsUpDown, UtensilsCrossed } from 'lucide-react'
 import { createOrder } from '@/app/dashboard/actions'
 import { formatPrice } from '@/lib/utils'
 import {
@@ -52,6 +52,7 @@ export function AddOrderForm({ restaurantId, menuItems }: AddOrderFormProps) {
     // Order Details
     const [tableNumber, setTableNumber] = useState('')
     const [orderType, setOrderType] = useState('dine_in')
+    const [specialRequest, setSpecialRequest] = useState('')
 
     // Item Selection State
     const [selectedItemId, setSelectedItemId] = useState<string>('')
@@ -170,6 +171,7 @@ export function AddOrderForm({ restaurantId, menuItems }: AddOrderFormProps) {
             order_type: orderType,
             table_number: tableNumber,
             total_amount: totalAmount,
+            special_request: specialRequest,
             items: cart
         }
 
@@ -180,6 +182,7 @@ export function AddOrderForm({ restaurantId, menuItems }: AddOrderFormProps) {
             setCart([])
             setTableNumber('')
             setOrderType('dine_in')
+            setSpecialRequest('')
             setSelectedItemId('')
             setCurrentSelections({})
         } else {
@@ -193,7 +196,7 @@ export function AddOrderForm({ restaurantId, menuItems }: AddOrderFormProps) {
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
                 <Button>
-                    <ShoppingCart className="mr-2 h-4 w-4" />
+                    <UtensilsCrossed className="mr-2 h-4 w-4" />
                     New Order
                 </Button>
             </DialogTrigger>
@@ -230,10 +233,18 @@ export function AddOrderForm({ restaurantId, menuItems }: AddOrderFormProps) {
                                     <Input
                                         value={tableNumber}
                                         onChange={(e) => setTableNumber(e.target.value)}
-                                        placeholder="e.g. 5"
                                     />
                                 </div>
                             )}
+                        </div>
+
+                        {/* Special Request */}
+                        <div className="space-y-2">
+                            <Label>Special Request / Note (Optional)</Label>
+                            <Input
+                                value={specialRequest}
+                                onChange={(e) => setSpecialRequest(e.target.value)}
+                            />
                         </div>
 
                         {/* 2. Item Search */}
