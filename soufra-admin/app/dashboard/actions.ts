@@ -302,30 +302,34 @@ export async function createOrder(restaurantId: string, orderData: any) {
         return { error: itemsError.message }
     }
 
-    revalidatePath(`/dashboard/restaurants/${restaurantId}`)
+    // Note: No revalidatePath needed as realtime subscription handles UI updates
     return { success: true }
 }
 
 export async function updateOrder(restaurantId: string, orderId: string, data: any) {
     const supabase = await createClient()
 
-    // 1. Update Order Details (Status, Total, Table, Type)
-    const { error: orderError } = await supabase
-        .from('orders')
-        .update({
-            status: data.status,
-            order_type: data.order_type,
-            table_number: data.table_number,
-            total_amount: data.total_amount
-        })
-        .eq('id', orderId)
+    // 1. Update Order Details - only update fields that are provided
+    const updates: any = {}
+    if (data.status !== undefined) updates.status = data.status
+    if (data.order_type !== undefined) updates.order_type = data.order_type
+    if (data.table_number !== undefined) updates.table_number = data.table_number
+    if (data.total_amount !== undefined) updates.total_amount = data.total_amount
 
-    if (orderError) {
-        console.error('Error updating order:', orderError)
-        return { error: 'Failed to update order details' }
+    // Only update if there are fields to update
+    if (Object.keys(updates).length > 0) {
+        const { error: orderError } = await supabase
+            .from('orders')
+            .update(updates)
+            .eq('id', orderId)
+
+        if (orderError) {
+            console.error('Error updating order:', orderError)
+            return { error: 'Failed to update order details' }
+        }
     }
 
-    // 2. Update Items (Strategy: Delete all and recreate)
+    // 2. Update Items (Strategy: Delete all and recreate) - only if items are provided
     if (data.items) {
         // Delete existing items
         const { error: deleteError } = await supabase
@@ -358,6 +362,54 @@ export async function updateOrder(restaurantId: string, orderId: string, data: a
         }
     }
 
-    revalidatePath(`/dashboard/restaurants/${restaurantId}`)
+    // Note: No revalidatePath needed as realtime subscription handles UI updates
+    return { success: true }
+}
+
+export async function deleteOrder(restaurantId: string, orderId: string) {
+    const supabase = await createClient()
+
+    // Delete order items first (foreign key constraint)
+    const { error: itemsError } = await supabase
+        .from('order_items')
+        .delete()
+        .eq('order_id', orderId)
+
+    if (itemsError) {
+        console.error('Error deleting order items:', itemsError)
+        return { error: 'Failed to delete order items' }
+    }
+
+    // Delete the order
+    const { error: orderError } = await supabase
+        .from('orders')
+        .delete()
+        .eq('id', orderId)
+
+    if (orderError) {
+        console.error('Error deleting order:', orderError)
+        return { error: 'Failed to delete order' }
+    }
+
+    // Note: No revalidatePath needed as realtime subscription handles UI updates
+    return { success: true }
+}
+
+export async function deleteMenuItem(restaurantId: string, itemId: string) {
+    const supabase = await createClient()
+
+    // Delete the menu item
+    const { error } = await supabase
+        .from('menu_items')
+        .delete()
+        .eq('id', itemId)
+        .eq('restaurant_id', restaurantId)
+
+    if (error) {
+        console.error('Error deleting menu item:', error)
+        return { error: 'Failed to delete menu item' }
+    }
+
+    revalidatePath(`/dashboard/restaurants`)
     return { success: true }
 }

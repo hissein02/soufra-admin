@@ -6,6 +6,7 @@ import { AddItemForm } from '@/components/forms/add-item-form'
 import { EditCategoryForm } from '@/components/forms/edit-category-form'
 import { EditItemForm } from '@/components/forms/edit-item-form'
 import { ItemAvailabilityToggle } from '@/components/item-availability-toggle'
+import { DeleteMenuItemButton } from '@/components/delete-menu-item-button'
 import { Card } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { ArrowLeft } from 'lucide-react'
@@ -62,8 +63,13 @@ export default async function MenuPage(props: { params: Promise<{ slug: string }
                                     className={`overflow-hidden flex flex-col h-full hover:shadow-md transition-shadow group relative ${item.is_available ? 'bg-green-50/50 border-green-300' : 'bg-red-50/50 border-red-300'
                                         }`}
                                 >
-                                    <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity z-10">
+                                    <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity z-10 flex gap-1">
                                         <EditItemForm restaurantId={restaurant.id} item={item} existingItems={allItems} />
+                                        <DeleteMenuItemButton
+                                            restaurantId={restaurant.id}
+                                            itemId={item.id}
+                                            itemName={item.name}
+                                        />
                                     </div>
                                     {item.image_url && (
                                         <div className="h-32 w-full relative bg-gray-100 flex items-center justify-center">

@@ -231,6 +231,8 @@ export function EditOrderForm({ restaurantId, order, menuItems }: EditOrderFormP
 
         if (result.success) {
             setOpen(false)
+            // UI will be updated automatically via realtime subscription
+            console.log('✅ Order updated successfully')
         } else {
             console.error(result.error)
             alert('Failed to update order')

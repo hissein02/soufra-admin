@@ -44,10 +44,9 @@ export function QuickStatusButton({ order, restaurantId }: QuickStatusButtonProp
         try {
             await updateOrder(restaurantId, order.id, {
                 status: nextStatus,
-                // Ensure we explicitly verify/send this if needed, 
-                // but usually simpler just to update status. 
-                // We'll trust updateOrder handles partial updates.
             })
+            // UI will be updated automatically via realtime subscription
+            console.log('✅ Order status updated to:', nextStatus)
         } catch (error) {
             console.error("Failed to update status", error)
             alert("Failed to update status")

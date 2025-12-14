@@ -118,9 +118,10 @@ export function AddOrderForm({ restaurantId, menuItems }: AddOrderFormProps) {
                     if (choice) {
                         selectedOptionsList.push({
                             group_name: group.name,
-                            name: choice.name, // The backend expects 'name' for display
+                            name: choice.name,
                             choice_name: choice.name,
-                            price: choice.extra_price
+                            price: choice.extra_price,
+                            item_id: choice.item_id // Include item_id if this choice references another item
                         })
                     }
                 }
